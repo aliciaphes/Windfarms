@@ -1,0 +1,19 @@
+.ng5-slider {
+  margin: 3em;
+}
+
+.info{
+  margin: 2em;
+}
+
+
+.error-message{
+  margin: 2em;
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+  padding: .75rem 1.25rem;
+  float: left;
+  border: 1px solid transparent;
+  border-radius: .25rem;
+}

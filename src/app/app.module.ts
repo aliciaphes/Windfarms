@@ -1,16 +1,21 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
-import { AppComponent } from './app.component';
+import { MainComponent } from './components/main/main.component';
+import { HttpClientModule } from '@angular/common/http';
+import { PapaParseModule } from 'ngx-papaparse';
+import { Ng5SliderModule } from 'ng5-slider';
 
 @NgModule({
   declarations: [
-    AppComponent
+    MainComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule,
+    PapaParseModule,
+    Ng5SliderModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [MainComponent]
 })
 export class AppModule { }

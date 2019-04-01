@@ -1,0 +1,36 @@
+<div style="text-align:center">
+  <h1>
+    {{appTitle}}
+  </h1>
+</div>
+
+<div class="info">
+  <p>
+    We have a hypothesis that larger wind farms tend to be less efficient, since
+    they experience higher "wake loss" (larger farms have more rows of turbines
+    that obstruct the wind for each downwind turbine).
+  </p>
+  <p>
+    This is an interactive web application that might help test this hypothesis.
+  </p>
+  <p>
+    The slider can be used to update the values in the chart to display the data more in detail.
+  </p>
+</div>
+
+
+<div class="error-message" *ngIf="errorMessage !== []">
+  <span *ngFor="let line of errorMessage">{{line}}<br/></span>
+</div>
+
+
+<div *ngIf="errorMessage.length === 0">
+  <div id="chart-plotly"></div>
+  <div style="margin-right: 3em">
+    <ng5-slider *ngIf="minValue !== undefined && maxValue !== undefined"
+                [(value)]="minValue" [(highValue)]="maxValue"
+                [options]="options"
+                (userChange)="onUserChange($event)">
+    </ng5-slider>
+  </div>
+</div>
