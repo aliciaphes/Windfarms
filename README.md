@@ -5,11 +5,11 @@ We have a hypothesis that larger wind farms tend to be less efficient, since the
 This is an interactive web application that might help test this hypothesis.
 
 This is a screenshot of the chart:<br/>
-![Chart with windfarm data](src/assets/images1.jpg)
+![Chart with windfarm data](src/assets/images/1.jpg)
 <br/>*(every point has its marker)*
 
 The slider can be used to update the values in the chart to display the data more in detail:<br/>
-![Chart with narrowed-down data](src/assets/1-narrowed-down.jpg)
+![Chart with narrowed-down data](src/assets/images/1-narrowed-down.jpg)
 <br/>*(e.g. between 200 and 400 MW)*
 
 ## Instructions
