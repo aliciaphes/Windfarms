@@ -14,6 +14,8 @@ export class MainComponent implements OnInit {
 
   public appTitle = 'Farm efficiency';
 
+  public csvFilePath = '../../../assets/data/REsuretyWebApplicationEngineer.csv';
+
   public minValue: number;
   public maxValue: number;
 
@@ -42,36 +44,17 @@ export class MainComponent implements OnInit {
 
   ngOnInit() {
 
-    const csvFilePath = '../../../assets/data/REsuretyWebApplicationEngineer.csv';
-
-    this.httpClient.get(csvFilePath,
+    // check file exists:
+    this.httpClient.get(this.csvFilePath,
       { responseType: 'text',
         headers: new HttpHeaders({
           Accept: 'text/csv'
         })
      })
     .subscribe(() => {
-      this.papa.parse(csvFilePath, {
-        header: true,
-        dynamicTyping: true,
-        download: true,
-        complete: (results) => {
-          if (results.data) {
 
-            this.formatDataSet(results);
+      this.parseDataAndPlot(this.csvFilePath);
 
-            const dataSet = this.getDataForAxes(this.dataToRender);
-            this.minValue = dataSet.labels[0];
-            this.maxValue = dataSet.labels[dataSet.labels.length - 1];
-
-            this.drawPlotlyChart(dataSet);
-          } else {
-            this.errorMessage = [
-              'Could not process file.'
-            ];
-          }
-        }
-      });
     },
     (err) => {
       if (err.status === 404) {
@@ -79,6 +62,30 @@ export class MainComponent implements OnInit {
           'No data file found.',
           'Make sure the CSV file is in the \'data\' folder.'
         ];
+      }
+    });
+  }
+
+  parseDataAndPlot(csvFilePath: string) {
+    this.papa.parse(csvFilePath, {
+      header: true,
+      dynamicTyping: true,
+      download: true,
+      complete: (results) => {
+        if (results.data) {
+
+          this.formatDataSet(results);
+
+          const dataSet = this.getDataForAxes(this.dataToRender);
+          this.minValue = dataSet.labels[0];
+          this.maxValue = dataSet.labels[dataSet.labels.length - 1];
+
+          this.drawPlotlyChart(dataSet);
+        } else {
+          this.errorMessage = [
+            'Could not process file.'
+          ];
+        }
       }
     });
   }
@@ -129,6 +136,7 @@ export class MainComponent implements OnInit {
 
 
   getDataForAxes(dataToRender: any[]) {
+    // get the values for the X axis with 2 decimals
     const Xvalues = dataToRender.map((element: any) => {
       const formattedNumber = element.x;
       return parseFloat(formattedNumber.toFixed(2));
@@ -163,7 +171,6 @@ export class MainComponent implements OnInit {
     rawData = rawData.filter((element: any) => element.GenerationMWhPerYear !== 'NA');
 
     this.dataToRender = [];
-    // let found: number;
     rawData.forEach( (element: any) => { // todo: switch to map() ?
         this.dataToRender.push({
           x: element.CapacityMW,
