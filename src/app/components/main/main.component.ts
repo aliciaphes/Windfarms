@@ -22,17 +22,18 @@ export class MainComponent implements OnInit {
   public errorMessage = [];
 
   public dataToRender: any[];
+  public filteredDataToRender: any[];
 
   public options: Options = {
-    step: 0.1,
+    step: 1,
     translate: (value: number, label: LabelType): string => {
       switch (label) {
         case LabelType.Low:
-          return '<b>' + value + ' MW</b>';
+          return '<b>' + value + ' %</b>';
         case LabelType.High:
-          return '<b>' + value + ' MW</b>';
+          return '<b>' + value + ' %</b>';
         default:
-          return value + ' MW';
+          return value + ' %';
       }
     }
   };
@@ -77,8 +78,8 @@ export class MainComponent implements OnInit {
           this.formatDataSet(results);
 
           const dataSet = this.getDataForAxes(this.dataToRender);
-          this.minValue = dataSet.labels[0];
-          this.maxValue = dataSet.labels[dataSet.labels.length - 1];
+          this.minValue = 0;
+          this.maxValue = 100;
 
           this.drawPlotlyChart(dataSet);
         } else {
@@ -103,11 +104,8 @@ export class MainComponent implements OnInit {
     };
 
     const layout = {
-      xaxis: {
-        title: 'maximum possible \'nameplate capacity\' power generation (MW)'
-      },
       yaxis: {
-        title: 'Average annual energy generation (MW-hours)'
+        title: 'Wind farm efficiency (net capacity factor) % per year'
       }
     };
 
@@ -127,36 +125,26 @@ export class MainComponent implements OnInit {
     this.minValue = changeContext.value;
     this.maxValue = changeContext.highValue;
 
-    const filteredDataToRender = this.dataToRender.filter((element: any) =>
-    element.x >= this.minValue && element.x <= this.maxValue);
+    this.filteredDataToRender = this.dataToRender.filter((element: any) =>
+    element.y >= this.minValue && element.y <= this.maxValue);
 
-    const dataSet = this.getDataForAxes(filteredDataToRender);
+    const dataSet = this.getDataForAxes(this.filteredDataToRender);
     this.drawPlotlyChart(dataSet);
   }
 
 
   getDataForAxes(dataToRender: any[]) {
-    // get the values for the X axis with 2 decimals
-    const Xvalues = dataToRender.map((element: any) => {
-      const formattedNumber = element.x;
-      return parseFloat(formattedNumber.toFixed(2));
-    });
-
+    const Xvalues = dataToRender.map(element => element.x);
     const Yvalues = dataToRender.map(element => element.y);
-
-    const labels = dataToRender.map(element => element.name);
-
     return {
       labels: Xvalues,
-      values: Yvalues,
-      texts: labels
+      values: Yvalues
     };
   }
 
 
 
   formatDataSet(rawBundle: any) {
-
     // remove the rows of data that contain errors:
     if (rawBundle.errors && rawBundle.errors.length > 0) {
       rawBundle.errors.map( (element: any) => {
@@ -171,23 +159,34 @@ export class MainComponent implements OnInit {
     rawData = rawData.filter((element: any) => element.GenerationMWhPerYear !== 'NA');
 
     this.dataToRender = [];
-    rawData.forEach( (element: any) => { // todo: switch to map() ?
-        this.dataToRender.push({
-          x: element.CapacityMW,
-          y: element.GenerationMWhPerYear,
-          name: element.Name
-        });
+
+    const arrayOfGenerationMWhPerYearValues = rawData.map((element: any) => element.GenerationMWhPerYear / element.CapacityMW);
+    const max = arrayOfGenerationMWhPerYearValues.reduce((a: number, b: number) => {
+      return Math.max(a, b);
+    }); // const max = Math.max(...arrayOfGenerationMWhPerYearValues);
+
+    rawData.forEach( (element: any) => {
+      const res = element.GenerationMWhPerYear / element.CapacityMW;
+      const val = (res * 100) / max;
+      this.dataToRender.push({
+        x: element.Name,
+        y: val
+      });
     });
 
     // sort in ascending order:
     this.dataToRender.sort((a, b) => {
-      if (a.x < b.x) {
+      if (a.y < b.y) {
         return -1;
       }
-      if (a.x > b.x) {
+      if (a.y > b.y) {
         return 1;
       }
       return 0;
     });
+
+    // initialize filteredDataToRender so data is showing the first time:
+    this.filteredDataToRender = this.dataToRender;
   }
+
 }

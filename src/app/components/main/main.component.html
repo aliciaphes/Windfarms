@@ -14,6 +14,16 @@
     This is an interactive web application that might help test this hypothesis.
   </p>
   <p>
+    A wind farm's efficiency is defined by its 'net capacity factor', which is:
+  </p>
+  <p>
+    <strong>generation / (capacity * time)</strong>
+  </p>
+  <ul>
+    <li>All the farms are shown in the X axis.</li>
+    <li>The efficiency percentage is shown in the Y axis using 100% as the highest value in the CSV file.</li>
+  </ul>
+  <p>
     The slider can be used to update the values in the chart to display the data more in detail.
   </p>
 </div>
@@ -33,4 +43,9 @@
                 (userChange)="onUserChange($event)">
     </ng5-slider>
   </div>
+
+  <h4>Farms that have a {{minValue}}-{{maxValue}} % efficiency:</h4>
+  <ul>
+    <li *ngFor="let farm of filteredDataToRender">{{farm.x}}</li>
+  </ul>
 </div>
